@@ -1,16 +1,39 @@
 import os
-from flask import Flask, send_from_directory
 
-app = Flask(__name__, static_folder="build")
+from flask import Flask, send_from_directory, jsonify, make_response
+from flask_migrate import Migrate
+from flask_restful import Api, Resource
 
+from models import db, User
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, "index.html")
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///app.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.json.compact = False
+
+migrate = Migrate(app, db)
+db.init_app(app)
+
+api = Api(app)
+
+@app.route('/')
+def index():
+    return "Bus Management API"
+
+class Users(Resource):
+    def get(self):
+        response_dict_list = [user.to_dict() for user in User.query.all()]
+        return response_dict_list, 200  
+    
+api.add_resource(Users, '/users')
+
+# @app.route("/", defaults={"path": ""})
+# @app.route("/<path:path>")
+# def serve(path):
+#     if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+#         return send_from_directory(app.static_folder, path)
+#     else:
+#         return send_from_directory(app.static_folder, "index.html")
 
 
 if __name__ == "__main__":
