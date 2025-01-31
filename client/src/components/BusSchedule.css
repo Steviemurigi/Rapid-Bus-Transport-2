@@ -29,11 +29,11 @@ h2 {
   font-weight: bold; 
 }
 
-  .filters input::placeholder {
-    color: black;
+.filters input::placeholder {
+    color: rgba(0, 0, 0, 0.5); /* Optional lighter placeholder */
     opacity: 1;
-
 }
+
 .bus-schedule-table {
   color: #333;
   width: 100%;
@@ -49,26 +49,38 @@ h2 {
 }
 
 .bus-schedule-table th {
-  background: #bc8a15;
-  color: rgb(20, 20, 20);
+    background: #bc8a15;
+    color: rgb(20,20,20);
 }
 
 .bus-schedule-table tr:nth-child(even) {
-  background: #f2f2f2;
+    background: #f2f2f2;
 }
 
 .book-btn {
-  background: #D97706;
-  height: 35px;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 9px;
-  display: colu;
+    background: #D97706;
+    height: 35px;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size:14px; /* Adjusted font size */
+    display:inline-block; /* Corrected display property */
 }
 
 .book-btn:hover {
-  background: #888785;
+    background:#b76e02; /* Darker shade for hover effect */
+}
+
+/* Optional Media Queries for Responsiveness */
+@media (max-width:768px) {
+    .bus-schedule-container {
+        width:95%; /* Adjust width for smaller screens */
+    }
+
+    .filters {
+        flex-direction: column; /* Stack filters vertically on small screens */
+        align-items:center; 
+    }
 }
