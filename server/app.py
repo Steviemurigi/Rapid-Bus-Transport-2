@@ -9,7 +9,7 @@ from datetime import datetime
 from models import db, User, Bus, Route, Schedule, Seat, Booking, Payment
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')  # Change for production
