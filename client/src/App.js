@@ -9,19 +9,6 @@ import DriverDashboard from "./components/DriverDashboard";
 import BusSchedule from "./components/BusSchedule";
 import UserDashboard from "./components/UserDashboard";
 
-const Register = () => (
-  <section id="register">
-    <h2>Register</h2>
-    <p>Create a new account to start booking your travels.</p>
-    <form>
-      <input type="text" placeholder="Full Name" required />
-      <input type="email" placeholder="Email" required />
-      <input type="password" placeholder="Password" required />
-      <button type="submit">Register</button>
-    </form>
-  </section>
-);
-
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token"); // Check if user is logged in
@@ -60,10 +47,9 @@ function App() {
           <Route path="/busSchedules" element={<BusSchedule />} />
           <Route path="/bookings" element={<UserDashboard />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/signup" element={<SignupForm />} /> {/* This handles registration */}
           <Route path="/driver-dashboard" element={<DriverDashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/signup" element={<SignupForm />} />
         </Routes>
       </main>  
 
