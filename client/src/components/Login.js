@@ -1,72 +1,78 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import './Login.css';
+import { Link, useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function Login() {
-  const [password, setPassword] = useState('');
-  const [isVisible, setIsVisible] = useState(true);  // Control visibility of the login form
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-  const handlePassWordChange = (e) => {
-    setPassword(e.target.value);
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {  // ✅ Fixed backticks
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user_role", data.role);
+        navigate("/dashboard");
+      } else {
+        setError(data.message || "Invalid credentials");
+      }
+    } catch (error) {
+      setError("Server error. Please try again.");
+    }
   };
-
-  // Function to close the login form
-  const handleClose = () => {
-    setIsVisible(false);  // Hides the form when the close button is clicked
-  };
-
-  // If isVisible is false, return null to render nothing
-  if (!isVisible) {
-    return null;
-  }
 
   return (
     <div className="login-container">
-      {/* Close button */}
-      <button className="close-button" onClick={handleClose}>✖️</button>
-      
-      {/* Form Container */}
       <div className="login-form-container">
         <h3>Welcome back!</h3>
         <p>Log into your account</p>
-        
-        <form className="login-form">
-          {/* Email Input */}
+
+        {error && <p className="error-message">{error}</p>}
+
+        <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email:</label>
             <input
               type="email"
-              name="email"
-              required
+              value={email}
+              onChange={handleEmailChange}
               className="login-input"
+              required
             />
           </div>
-          
-          {/* Password Input */}
+
           <div className="form-group">
             <label>Password:</label>
             <input
               type="password"
               value={password}
-              onChange={handlePassWordChange}
+              onChange={handlePasswordChange}
               className="login-input"
               required
             />
           </div>
-          
-          {/* Login Button */}
+
           <button type="submit" className="login-button">Login</button>
         </form>
 
-        {/* Footer with Links */}
         <div className="login-footer">
-          <p className="forgotpassword">
-            <Link to="/forgot-password">Forgot password?</Link>
-          </p>
-          
-          <p className="signup-text">
-            Don't have an account? <Link to="/signup">Sign Up</Link>
-          </p>
+          <p><Link to="/forgot-password">Forgot password?</Link></p>
+          <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
         </div>
       </div>
     </div>

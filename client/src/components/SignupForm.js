@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    agreeTerms: false
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "Customer", // Default role
   });
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Invalid email address';
-    if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
-    if (!formData.agreeTerms) newErrors.agreeTerms = 'You must agree to the terms';
-    
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = "Invalid email address";
+    if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -32,55 +32,57 @@ const SignupForm = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log('Form submitted:', formData);
-      alert('Account created successfully!');
+      const response = await fetch(`${API_BASE_URL}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token); // Store JWT
+        localStorage.setItem("user_role", data.role); // Store user role
+        alert("Account created successfully!");
+        navigate("/dashboard"); // Redirect after signup
+      } else {
+        setErrors({ apiError: data.message || "Signup failed" });
+      }
     } catch (error) {
-      console.error('Submission error:', error);
+      setErrors({ apiError: "Server error. Please try again later." });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="bg-gray-800 p-8 rounded-xl shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-amber-600 mb-6 text-center">Create Account</h2>
-        
+
+        {errors.apiError && <p className="text-red-500 text-center mb-4">{errors.apiError}</p>}
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-300 mb-2">First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.firstName ? 'border-2 border-red-500' : ''}`}
-              />
-              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
-            </div>
-            
-            <div>
-              <label className="block text-gray-300 mb-2">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.lastName ? 'border-2 border-red-500' : ''}`}
-              />
-              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-            </div>
+          <div>
+            <label className="block text-gray-300 mb-2">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.name ? "border-2 border-red-500" : ""}`}
+            />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div>
@@ -90,7 +92,7 @@ const SignupForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.email ? 'border-2 border-red-500' : ''}`}
+              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.email ? "border-2 border-red-500" : ""}`}
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
@@ -102,7 +104,7 @@ const SignupForm = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.password ? 'border-2 border-red-500' : ''}`}
+              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.password ? "border-2 border-red-500" : ""}`}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
@@ -114,38 +116,36 @@ const SignupForm = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.confirmPassword ? 'border-2 border-red-500' : ''}`}
+              className={`w-full p-3 bg-gray-700 rounded-lg text-white ${errors.confirmPassword ? "border-2 border-red-500" : ""}`}
             />
             {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
           </div>
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name="agreeTerms"
-              checked={formData.agreeTerms}
+          <div>
+            <label className="block text-gray-300 mb-2">Role</label>
+            <select
+              name="role"
+              value={formData.role}
               onChange={handleChange}
-              className="w-4 h-4 text-amber-600 bg-gray-700 rounded"
-            />
-            <label className="ml-2 text-gray-300">
-              I agree to the <span className="text-amber-600 hover:underline cursor-pointer">Terms & Conditions</span>
-            </label>
+              className="w-full p-3 bg-gray-700 rounded-lg text-white"
+            >
+              <option value="Customer">Customer</option>
+              <option value="Driver">Driver</option>
+            </select>
           </div>
-          {errors.agreeTerms && <p className="text-red-500 text-sm">{errors.agreeTerms}</p>}
 
           <button
             type="submit"
             disabled={isLoading}
             className={`w-full bg-amber-600 text-white py-3 rounded-lg transition-colors ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-amber-700'
+              isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-amber-700"
             }`}
           >
-            {isLoading ? 'Creating Account...' : 'Create Account'}
+            {isLoading ? "Creating Account..." : "Create Account"}
           </button>
 
           <p className="text-gray-400 text-center mt-4">
-            Already have an account?{' '}
-            <span className="text-amber-600 hover:underline cursor-pointer">Login here</span>
+            Already have an account? <span className="text-amber-600 hover:underline cursor-pointer">Login here</span>
           </p>
         </form>
       </div>
