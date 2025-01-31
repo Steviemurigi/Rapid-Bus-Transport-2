@@ -9,7 +9,7 @@ from datetime import datetime
 from models import db, User, Bus, Route, Schedule, Seat, Booking, Payment
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"])
+CORS(app)
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')  # Change for production
@@ -193,7 +193,7 @@ class PaymentResource(Resource):
         return {"message": "Payment successful"}, 201
 
 # ---- ADD ROUTES TO API ----
-api.add_resource(UserRegister, '/register')
+api.add_resource(UserRegister, '/signup')
 api.add_resource(UserLogin, '/login')
 api.add_resource(BusResource, '/buses', '/buses/<int:bus_id>')
 api.add_resource(RouteResource, '/routes')
