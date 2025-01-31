@@ -2,12 +2,14 @@ import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime
 from models import db, User, Bus, Route, Schedule, Seat, Booking, Payment
 
 app = Flask(__name__)
+CORS(app)
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')  # Change for production
@@ -23,7 +25,7 @@ jwt = JWTManager(app)
 
 @app.route('/')
 def index():
-    return "Wellness API"
+    return "Bus Management API"
 
 # ---- AUTHENTICATION ----
 class UserRegister(Resource):
