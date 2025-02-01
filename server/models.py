@@ -81,14 +81,16 @@ class Schedule(db.Model, SerializerMixin):
     def serialize(self):
         return {
             'id': self.id,
-            'bus_name': self.bus.name,
-            'date': self.date,
-            'route': self.route_details,
-            'departure': self.departure_time.strftime('%I:%M %p'),
-            'departure_area': self.start_location,
+            'bus_name': self.bus.name, #Or bus_name if you prefer
+            'date': self.date.isoformat() if self.date else None, # Format date appropriately
+            'departure_time': self.departure_time.strftime('%I:%M %p') if self.departure_time else None, # Format time
+            'arrival_time': self.arrival_time.strftime('%I:%M %p') if self.arrival_time else None, # Format time
+            'start_location': self.start_location,
+            'end_location': self.end_location,
+            'route_details': self.route_details,
             'destination': self.destination,
-            'available_seats': sum(1 for seat in self.seats if seat.status == "available"),
-            'price': self.price
+            'price': self.price,
+            'status': self.status # Add status
         }
 
 class Seat(db.Model, SerializerMixin):
