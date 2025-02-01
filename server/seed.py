@@ -13,9 +13,9 @@ with app.app_context():
     # Create Users (Admins, Drivers, Customers)
     users = [
         User(name="Admin User", email="admin@example.com", password_hash=generate_password_hash("admin123"), role="Admin", contact_info="+1234567890"),
-        User(name="John Doe", email="driver1@example.com", password_hash=generate_password_hash("driver123"), role="Driver", contact_info="+1987654321"),
+        User(name="Kenneth Ochieng", email="driver1@example.com", password_hash=generate_password_hash("driver123"), role="Driver", contact_info="+1987654321"),
         User(name="Jane Smith", email="driver2@example.com", password_hash=generate_password_hash("driver123"), role="Driver", contact_info="+1678901234"),
-        User(name="Alice Brown", email="customer1@example.com", password_hash=generate_password_hash("customer123"), role="Customer", contact_info="+1456789123"),
+        User(name="Alice Nduta", email="customer1@example.com", password_hash=generate_password_hash("customer123"), role="Customer", contact_info="+1456789123"),
         User(name="Bob Green", email="customer2@example.com", password_hash=generate_password_hash("customer123"), role="Customer", contact_info="+1345678901"),
     ]
     db.session.add_all(users)
@@ -23,16 +23,22 @@ with app.app_context():
 
     # Create Buses
     buses = [
-        Bus(license_plate="ABC123", total_seats=40, bus_type="Standard", owner_id=2, status="Active"),
-        Bus(license_plate="XYZ789", total_seats=30, bus_type="Luxury", owner_id=3, status="Active"),
+        Bus(license_plate="KDN123", total_seats=40, bus_type="Standard", owner_id=2, status="Active", name="Bus 1", departure_area="New York", price=50),
+        Bus(license_plate="KDD789", total_seats=30, bus_type="Luxury", owner_id=3, status="Active", name="Bus 2", departure_area="San Francisco", price=75),
+        Bus(license_plate="KDE456", total_seats=50, bus_type="Standard", owner_id=2, status="Active", name="Bus 3", departure_area="Nairobi", price=60),
+        Bus(license_plate="KDF789", total_seats=60, bus_type="Luxury", owner_id=3, status="Active", name="Bus 4", departure_area="Mombasa", price=90),
+        Bus(license_plate="KDG321", total_seats=45, bus_type="Standard", owner_id=2, status="Active", name="Bus 5", departure_area="Kisumu", price=55),
     ]
     db.session.add_all(buses)
     db.session.commit()
 
     # Create Routes
     routes = [
-        Route(start_location="New York", end_location="Washington D.C.", route_details="NY - Philadelphia - Baltimore - D.C.", distance=230),
-        Route(start_location="San Francisco", end_location="Los Angeles", route_details="SF - San Jose - Bakersfield - LA", distance=380),
+        Route(start_location="Nairobi CBD", end_location="Mombasa", route_details="Nairobi - Mombasa", distance=230, name="Route 1", destination="Mombasa"),
+        Route(start_location="Mombasa", end_location="Nakuru", route_details="Mombasa - Nakuru", distance=380, name="Route 2", destination="Nakuru"),
+        Route(start_location="Nakuru", end_location="Kisumu", route_details="Nakuru - Kisumu", distance=380, name="Route 3", destination="Kisumu"),
+        Route(start_location="Kisumu", end_location="Nairobi CBD", route_details="Kisumu - Nairobi CBD", distance=380, name="Route 4", destination="Nairobi CBD"),
+        Route(start_location="Mombasa", end_location="Kisumu", route_details="Mombasa - Kisumu", distance=380, name="Route 5", destination="Kisumu"),
     ]
     db.session.add_all(routes)
     db.session.commit()

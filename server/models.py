@@ -48,6 +48,9 @@ class Bus(db.Model, SerializerMixin):
     bus_type = db.Column(db.String(50), nullable=False)  # Standard, Luxury
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     status = db.Column(db.String(20), default="active")  # Active, Inactive
+    name = db.Column(db.String(100), nullable=False)  # Added for frontend
+    departure_area = db.Column(db.String(100), nullable=False)  # Added for frontend
+    price = db.Column(db.Float, nullable=False)  # Added for frontend
 
     def serialize(self):
         return {
@@ -56,10 +59,12 @@ class Bus(db.Model, SerializerMixin):
             "total_seats": self.total_seats,
             "bus_type": self.bus_type,
             "owner_id": self.owner_id,
-            "status": self.status
+            "status": self.status,
+            "name": self.name,
+            "departure_area": self.departure_area,
+            "price": self.price
         }
 
-    # Relationships
     schedules = db.relationship('Schedule', backref='bus', lazy=True)
 
 class Route(db.Model, SerializerMixin):
@@ -68,6 +73,8 @@ class Route(db.Model, SerializerMixin):
     end_location = db.Column(db.String(100), nullable=False)
     route_details = db.Column(db.Text, nullable=True)
     distance = db.Column(db.Float, nullable=True)
+    name = db.Column(db.String(100), nullable=False)  # Added for frontend
+    destination = db.Column(db.String(100), nullable=False)  # Added for frontend
 
     def serialize(self):
         return {
@@ -75,10 +82,11 @@ class Route(db.Model, SerializerMixin):
             "start_location": self.start_location,
             "end_location": self.end_location,
             "route_details": self.route_details,
-            "distance": self.distance
+            "distance": self.distance,
+            "name": self.name,
+            "destination": self.destination
         }
 
-    # Relationships
     schedules = db.relationship('Schedule', backref='route', lazy=True)
 
 class Schedule(db.Model, SerializerMixin):
@@ -101,7 +109,6 @@ class Schedule(db.Model, SerializerMixin):
             "status": self.status
         }
 
-    # Relationships
     seats = db.relationship('Seat', backref='schedule', lazy=True)
     bookings = db.relationship('Booking', backref='schedule', lazy=True)
 
@@ -121,7 +128,6 @@ class Seat(db.Model, SerializerMixin):
             "status": self.status
         }
 
-    # Many-to-Many relationship with Booking
     bookings = db.relationship('Booking', secondary=booking_seat_association, backref='seats')
 
 class Booking(db.Model, SerializerMixin):
