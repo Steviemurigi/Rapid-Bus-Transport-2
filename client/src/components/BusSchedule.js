@@ -3,99 +3,108 @@ import axios from "axios";
 import "./BusSchedule.css";
 
 const BusSchedule = () => {
-  // State variables for bus schedules and filters
-  const [busSchedules, setBusSchedules] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedRoute, setSelectedRoute] = useState("");
-  const API_BASE_URL = process.env.REACT_APP_API_URL;
+    const [busSchedules, setBusSchedules] = useState([]);
+    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedRoute, setSelectedRoute] = useState("");
+    const [loading, setLoading] = useState(true); // Loading state
+    const [error, setError] = useState(null); // Error state
+    const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-  // Fetch bus schedules on component mount
-  useEffect(() => {
-    axios.get(`${API_BASE_URL}/schedules`) // Assuming your backend has a route at /api/schedules
-      .then((response) => {
-        setBusSchedules(response.data); // Assuming response contains an array of bus schedules
-      })
-      .catch((error) => {
-        console.error("Error fetching bus schedules:", error);
-      });
-  }, []);
+    useEffect(() => {
+        const fetchSchedules = async () => {
+            setLoading(true);
+            setError(null); // Clear any previous errors
+            try {
+                const response = await axios.get(`${API_BASE_URL}/schedules`); // Your backend endpoint
+                setBusSchedules(response.data);
+            } catch (err) {
+                console.error("Error fetching schedules:", err);
+                setError("Error fetching schedules. Please try again later."); // Set error message
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  // Filter buses based on selected date and route
-  const filteredBuses = busSchedules.filter(
-    (bus) =>
-      (selectedRoute === "" || bus.route === selectedRoute) && // Filter by route
-      (selectedDate === "" || bus.date === selectedDate) // Filter by date
-  );
+        fetchSchedules();
+    }, []); // Empty dependency array ensures this runs only once on mount
 
-  return (
-    <div className="bus-schedule-container">
-      <h2>View Available Schedules</h2>
+    const filteredBuses = busSchedules.filter(
+        (bus) =>
+            (selectedRoute === "" || bus.route === selectedRoute) &&
+            (selectedDate === "" || bus.date === selectedDate)
+    );
 
-      {/* Filters Section */}
-      <div className="filters">
-        <label>Select Travel Date:</label>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-        />
+    // Dynamically generate route options
+    const availableRoutes = [...new Set(busSchedules.map((bus) => bus.route))];
 
-        <label>Select Route:</label>
-        <select
-          value={selectedRoute}
-          onChange={(e) => setSelectedRoute(e.target.value)}
-        >
-          <option value="">All Routes</option>
-          {/* Filter based on route name from the schedule data */}
-          {[...new Set(busSchedules.map(bus => bus.route))].map(route => (
-            <option key={route} value={route}>{route}</option>
-          ))}
-        </select>
-      </div>
+    return (
+        <div className="bus-schedule-container">
+            <h2>View Available Schedules</h2>
 
-      {/* Bus Schedule Table */}
-      <table className="bus-schedule-table">
-        <thead>
-          <tr>
-            <th>Bus Name</th>
-            <th>Date</th>
-            <th>Route</th>
-            <th>Departure Time</th>
-            <th>Departure Area</th>
-            <th>Destination</th>
-            <th>Available Seats</th>
-            <th>Price (KES)</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredBuses.length > 0 ? (
-            filteredBuses.map((bus) => (
-              <tr key={bus.id}>
-                <td>{bus.bus_name}</td>
-                <td>{bus.date}</td>
-                <td>{bus.route}</td>
-                <td>{bus.departure}</td>
-                <td>{bus.departure_area}</td>
-                <td>{bus.destination}</td>
-                <td>{bus.available_seats}</td>
-                <td>{bus.price}</td>
-                <td>
-                  <button className="book-btn" onClick={() => alert(`Booking ${bus.bus_name}`)}>
-                    Book Now
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="9">No buses available for the selected date and route.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
+            <div className="filters">
+                <label>Select Travel Date:</label>
+                <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                />
+
+                <label>Select Route:</label>
+                <select
+                    value={selectedRoute}
+                    onChange={(e) => setSelectedRoute(e.target.value)}
+                >
+                    <option value="">All Routes</option>
+                    {availableRoutes.map((route) => (
+                        <option key={route} value={route}>
+                            {route}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            {loading && <div>Loading bus schedules...</div>}
+            {error && <div style={{ color: "red" }}>{error}</div>} {/* Display error message */}
+
+            {!loading && !error && ( // Only render the table if not loading and no error
+                <table className="bus-schedule-table">
+                    <thead>
+                        {/* ... table header ... */}
+                    </thead>
+                    <tbody>
+                        {filteredBuses.length > 0 ? (
+                            filteredBuses.map((bus) => (
+                                <tr key={bus.id}>
+                                    <td>{bus.bus_name}</td> {/* Access data from backend */}
+                                    <td>{bus.date}</td>
+                                    <td>{bus.route}</td>
+                                    <td>{bus.departure}</td>
+                                    <td>{bus.departure_area}</td>
+                                    <td>{bus.destination}</td>
+                                    <td>{bus.available_seats}</td>
+                                    <td>{bus.price}</td>
+                                    <td>
+                                        <button
+                                            className="book-btn"
+                                            onClick={() => alert(`Booking ${bus.bus_name}`)}
+                                        >
+                                            Book Now
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="9">
+                                    No buses available for the selected date and route.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    );
 };
 
 export default BusSchedule;
