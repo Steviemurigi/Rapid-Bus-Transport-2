@@ -69,7 +69,17 @@ const BusSchedule = () => {
             {!loading && !error && ( // Only render the table if not loading and no error
                 <table className="bus-schedule-table">
                     <thead>
-                        {/* ... table header ... */}
+                        <tr>
+                            <th>Bus Name</th> {/* Header for bus_name */}
+                            <th>Date</th> {/* Header for date */}
+                            <th>Route</th> {/* Header for route */}
+                            <th>Departure Time</th> {/* Header for departure */}
+                            <th>Departure Area</th> {/* Header for departure_area */}
+                            <th>Destination</th> {/* Header for destination */}
+                            <th>Available Seats</th> {/* Header for available_seats */}
+                            <th>Price (KES)</th> {/* Header for price */}
+                            <th>Action</th> 
+                        </tr>
                     </thead>
                     <tbody>
                         {filteredBuses.length > 0 ? (
