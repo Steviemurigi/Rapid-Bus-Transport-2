@@ -61,7 +61,7 @@ class Bus(db.Model, SerializerMixin):
             "departure_area": self.departure_area
         }
 
-class Schedule(db.Model):
+class Schedule(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     bus_id = db.Column(db.Integer, db.ForeignKey('bus.id'))
     departure_time = db.Column(db.DateTime)
@@ -78,7 +78,7 @@ class Schedule(db.Model):
     bookings = db.relationship('Booking', backref='schedule', lazy=True)
     bus = db.relationship('Bus', backref='schedules')
 
-    def to_dict(self):
+    def serialize(self):
         return {
             'id': self.id,
             'bus_name': self.bus.name,
