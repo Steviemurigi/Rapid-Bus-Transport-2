@@ -27,7 +27,7 @@ function Login() {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user_role", data.role);
-        navigate("/dashboard");
+        navigate("/");
       } else {
         setError(data.message || "Invalid credentials");
       }
