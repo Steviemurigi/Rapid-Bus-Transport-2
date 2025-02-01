@@ -1,21 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./BusSchedule.css";
 
 const BusSchedule = () => {
-  // Sample bus schedules with both 'date' and 'route'
-  const busSchedules = [
-    { id: 1, busName: "Bus 101", date: "2025-01-25", route: "Route A", departure: "10:00 AM", departureArea: "Nairobi CBD", destination: "Mombasa", availableSeats: 20, price: 500 },
-    { id: 2, busName: "Bus 202", date: "2025-01-25", route: "Route B", departure: "12:00 PM", departureArea: "Mombasa Town", destination: "Nakuru", availableSeats: 15, price: 700 },
-    { id: 3, busName: "Bus 303", date: "2025-01-26", route: "Route A", departure: "02:00 PM", departureArea: "Nakuru Town", destination: "Kisumu", availableSeats: 10, price: 600 },
-    { id: 4, busName: "Bus 404", date: "2025-01-27", route: "Route C", departure: "04:30 PM", departureArea: "Kisumu Bus Station", destination: "Nairobi", availableSeats: 25, price: 800 },
-    { id: 5, busName: "Bus 505", date: "2025-01-25", route: "Route C", departure: "06:00 PM", departureArea: "Mombasa CBD", destination: "Kisumu", availableSeats: 18, price: 650 },
-  ];
-
-  // State for filters
+  // State variables for bus schedules, routes, and filters
+  const [busSchedules, setBusSchedules] = useState([]);
+  const [routes, setRoutes] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedRoute, setSelectedRoute] = useState("");
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-  // Handle filtering buses
+  // Fetch the bus schedules and routes on component mount
+  useEffect(() => {
+    // Fetch routes first
+    axios.get(`${API_BASE_URL}/routes`) // Assuming your backend has a route at /api/routes
+      .then((response) => {
+        setRoutes(response.data); // Assuming response contains an array of routes
+      })
+      .catch((error) => {
+        console.error("Error fetching routes:", error);
+      });
+
+    // Fetch bus schedules
+    axios.get(`${API_BASE_URL}/schedules`) // Assuming your backend has a route at /api/schedules
+      .then((response) => {
+        setBusSchedules(response.data); // Assuming response contains an array of bus schedules
+      })
+      .catch((error) => {
+        console.error("Error fetching bus schedules:", error);
+      });
+  }, []);
+
+  // Filter buses based on selected date and route
   const filteredBuses = busSchedules.filter(
     (bus) =>
       (selectedRoute === "" || bus.route === selectedRoute) && // Filter by route
@@ -41,9 +57,9 @@ const BusSchedule = () => {
           onChange={(e) => setSelectedRoute(e.target.value)}
         >
           <option value="">All Routes</option>
-          <option value="Route A">Route A</option>
-          <option value="Route B">Route B</option>
-          <option value="Route C">Route C</option>
+          {routes.map((route) => (
+            <option key={route.id} value={route.name}>{route.name}</option>
+          ))}
         </select>
       </div>
 
@@ -68,7 +84,7 @@ const BusSchedule = () => {
               <tr key={bus.id}>
                 <td>{bus.busName}</td>
                 <td>{bus.date}</td>
-                <td>{bus.route}</td> {/* Display the Route */}
+                <td>{bus.route}</td>
                 <td>{bus.departure}</td>
                 <td>{bus.departureArea}</td>
                 <td>{bus.destination}</td>
@@ -93,4 +109,3 @@ const BusSchedule = () => {
 };
 
 export default BusSchedule;
-
