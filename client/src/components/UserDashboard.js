@@ -11,6 +11,7 @@ const UserDashboard = () => {
     date: "",
     schedule_id: ""  // Added schedule_id for booking
   });
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
 
   // State for schedules fetched from the backend
   const [schedules, setSchedules] = useState([]);
