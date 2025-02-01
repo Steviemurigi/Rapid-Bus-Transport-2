@@ -26,7 +26,8 @@ function App() {
           <ul>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/busSchedules"> Bus Schedule</Link></li>
-            <li><Link to="/bookings">My Bookings</Link></li>
+            {/* Show "My Bookings" only if the user is logged in */}
+            {token && <li><Link to="/bookings">My Bookings</Link></li>}
 
             {/* Show Login/Register if not logged in, otherwise show Logout */}
             {!token ? (
