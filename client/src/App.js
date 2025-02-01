@@ -28,7 +28,7 @@ function App() {
         <nav>
           <ul className="nav-left">
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/busSchedules"> Bus Schedule</Link></li>
+            <li><Link to="/schedules"> Bus Schedule</Link></li>
             {token && <li><Link to="/bookings">My Bookings</Link></li>}
           </ul>
 
@@ -53,7 +53,7 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/busSchedules" element={<BusSchedule />} />
+          <Route path="/schedules" element={<BusSchedule />} />
           <Route path="/bookings" element={<UserDashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignupForm />} />
