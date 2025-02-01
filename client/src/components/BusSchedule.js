@@ -3,25 +3,14 @@ import axios from "axios";
 import "./BusSchedule.css";
 
 const BusSchedule = () => {
-  // State variables for bus schedules, routes, and filters
+  // State variables for bus schedules and filters
   const [busSchedules, setBusSchedules] = useState([]);
-  const [routes, setRoutes] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedRoute, setSelectedRoute] = useState("");
   const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-  // Fetch the bus schedules and routes on component mount
+  // Fetch bus schedules on component mount
   useEffect(() => {
-    // Fetch routes first
-    axios.get(`${API_BASE_URL}/routes`) // Assuming your backend has a route at /api/routes
-      .then((response) => {
-        setRoutes(response.data); // Assuming response contains an array of routes
-      })
-      .catch((error) => {
-        console.error("Error fetching routes:", error);
-      });
-
-    // Fetch bus schedules
     axios.get(`${API_BASE_URL}/schedules`) // Assuming your backend has a route at /api/schedules
       .then((response) => {
         setBusSchedules(response.data); // Assuming response contains an array of bus schedules
@@ -57,8 +46,9 @@ const BusSchedule = () => {
           onChange={(e) => setSelectedRoute(e.target.value)}
         >
           <option value="">All Routes</option>
-          {routes.map((route) => (
-            <option key={route.id} value={route.name}>{route.name}</option>
+          {/* Filter based on route name from the schedule data */}
+          {[...new Set(busSchedules.map(bus => bus.route))].map(route => (
+            <option key={route} value={route}>{route}</option>
           ))}
         </select>
       </div>
@@ -82,16 +72,16 @@ const BusSchedule = () => {
           {filteredBuses.length > 0 ? (
             filteredBuses.map((bus) => (
               <tr key={bus.id}>
-                <td>{bus.busName}</td>
+                <td>{bus.bus_name}</td>
                 <td>{bus.date}</td>
                 <td>{bus.route}</td>
                 <td>{bus.departure}</td>
-                <td>{bus.departureArea}</td>
+                <td>{bus.departure_area}</td>
                 <td>{bus.destination}</td>
-                <td>{bus.availableSeats}</td>
+                <td>{bus.available_seats}</td>
                 <td>{bus.price}</td>
                 <td>
-                  <button className="book-btn" onClick={() => alert(`Booking ${bus.busName}`)}>
+                  <button className="book-btn" onClick={() => alert(`Booking ${bus.bus_name}`)}>
                     Book Now
                   </button>
                 </td>

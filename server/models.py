@@ -20,11 +20,9 @@ class User(db.Model, SerializerMixin):
     role = db.Column(db.String(20), nullable=False)  # Admin, Driver, Customer
     contact_info = db.Column(db.String(200), nullable=True)
 
-    # 🔹 Hash password before storing it
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    # 🔹 Verify hashed password
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
@@ -37,7 +35,6 @@ class User(db.Model, SerializerMixin):
             "contact_info": self.contact_info
         }
 
-    # Relationships
     buses = db.relationship('Bus', backref='owner', lazy=True)
     bookings = db.relationship('Booking', backref='customer', lazy=True)
 
@@ -48,9 +45,9 @@ class Bus(db.Model, SerializerMixin):
     bus_type = db.Column(db.String(50), nullable=False)  # Standard, Luxury
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     status = db.Column(db.String(20), default="active")  # Active, Inactive
-    name = db.Column(db.String(100), nullable=False)  # Added for frontend
-    departure_area = db.Column(db.String(100), nullable=False)  # Added for frontend
-    price = db.Column(db.Float, nullable=False)  # Added for frontend
+    name = db.Column(db.String(100), nullable=False)
+    departure_area = db.Column(db.String(100), nullable=False)
+    price = db.Column(db.Float, nullable=False)
 
     def serialize(self):
         return {
@@ -61,63 +58,47 @@ class Bus(db.Model, SerializerMixin):
             "owner_id": self.owner_id,
             "status": self.status,
             "name": self.name,
-            "departure_area": self.departure_area,
-            "price": self.price
+            "departure_area": self.departure_area
         }
 
-    schedules = db.relationship('Schedule', backref='bus', lazy=True)
-
-class Route(db.Model, SerializerMixin):
+class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    start_location = db.Column(db.String(100), nullable=False)
-    end_location = db.Column(db.String(100), nullable=False)
-    route_details = db.Column(db.Text, nullable=True)
-    distance = db.Column(db.Float, nullable=True)
-    name = db.Column(db.String(100), nullable=False)  # Added for frontend
-    destination = db.Column(db.String(100), nullable=False)  # Added for frontend
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "start_location": self.start_location,
-            "end_location": self.end_location,
-            "route_details": self.route_details,
-            "distance": self.distance,
-            "name": self.name,
-            "destination": self.destination
-        }
-
-    schedules = db.relationship('Schedule', backref='route', lazy=True)
-
-class Schedule(db.Model, SerializerMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    bus_id = db.Column(db.Integer, db.ForeignKey('bus.id'), nullable=False)
-    route_id = db.Column(db.Integer, db.ForeignKey('route.id'), nullable=False)
-    departure_time = db.Column(db.DateTime, nullable=False)
-    arrival_time = db.Column(db.DateTime, nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    status = db.Column(db.String(20), default="on time")  # On time, Canceled, Delayed
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "bus_id": self.bus_id,
-            "route_id": self.route_id,
-            "departure_time": self.departure_time,
-            "arrival_time": self.arrival_time,
-            "date": self.date,
-            "status": self.status
-        }
-
+    bus_id = db.Column(db.Integer, db.ForeignKey('bus.id'))
+    departure_time = db.Column(db.DateTime)
+    arrival_time = db.Column(db.DateTime)
+    date = db.Column(db.Date)
+    status = db.Column(db.String(50))
+    start_location = db.Column(db.String(100))
+    end_location = db.Column(db.String(100))
+    route_details = db.Column(db.String(255))
+    destination = db.Column(db.String(100))
+    price = db.Column(db.Float, nullable=False)  # Adjusted to Schedule level
+    
     seats = db.relationship('Seat', backref='schedule', lazy=True)
     bookings = db.relationship('Booking', backref='schedule', lazy=True)
+    bus = db.relationship('Bus', backref='schedules')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'bus_name': self.bus.name,
+            'date': self.date,
+            'route': self.route_details,
+            'departure': self.departure_time.strftime('%I:%M %p'),
+            'departure_area': self.start_location,
+            'destination': self.destination,
+            'available_seats': sum(1 for seat in self.seats if seat.status == "available"),
+            'price': self.price
+        }
 
 class Seat(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     schedule_id = db.Column(db.Integer, db.ForeignKey('schedule.id'), nullable=False)
     seat_number = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default="available")  # Available, Booked
+    status = db.Column(db.String(20), default="available")
+
+    bookings = db.relationship('Booking', secondary=booking_seat_association, backref='seats')
 
     def serialize(self):
         return {
@@ -128,14 +109,12 @@ class Seat(db.Model, SerializerMixin):
             "status": self.status
         }
 
-    bookings = db.relationship('Booking', secondary=booking_seat_association, backref='seats')
-
 class Booking(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     schedule_id = db.Column(db.Integer, db.ForeignKey('schedule.id'), nullable=False)
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
-    payment_status = db.Column(db.String(20), default="unpaid")  # Paid, Unpaid, Refunded
+    payment_status = db.Column(db.String(20), default="unpaid")
     total_amount = db.Column(db.Float, nullable=False)
 
     def serialize(self):
@@ -148,12 +127,10 @@ class Booking(db.Model, SerializerMixin):
             "total_amount": self.total_amount
         }
 
-    # Many-to-Many relationship with Seat (linked above)
-
 class Payment(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=False)
-    payment_method = db.Column(db.String(50), nullable=False)  # Card, Mobile Money
+    payment_method = db.Column(db.String(50), nullable=False)
     payment_date = db.Column(db.DateTime, default=datetime.utcnow)
     amount = db.Column(db.Float, nullable=False)
     transaction_id = db.Column(db.String(100), unique=True, nullable=False)
@@ -168,14 +145,15 @@ class Payment(db.Model, SerializerMixin):
             "transaction_id": self.transaction_id
         }
 
-    # Relationships
-    booking = db.relationship('Booking', backref='payment')
+    booking = db.relationship('Booking', backref='payments')
 
-class AdminLog(db.Model, SerializerMixin):  # Optional model for Admin actions
+class AdminLog(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     admin_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     action = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    admin = db.relationship('User', backref='admin_logs')
 
     def serialize(self):
         return {
@@ -184,6 +162,3 @@ class AdminLog(db.Model, SerializerMixin):  # Optional model for Admin actions
             "action": self.action,
             "timestamp": self.timestamp
         }
-
-    # Relationships
-    admin = db.relationship('User', backref='admin_logs')

@@ -6,7 +6,7 @@ from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime
-from models import db, User, Bus, Route, Schedule, Seat, Booking, Payment
+from models import db, User, Bus, Schedule, Seat, Booking, Payment
 
 app = Flask(__name__)
 CORS(app, origins=["https://rapid-bus-transport-2.vercel.app"])
@@ -110,17 +110,17 @@ class BusResource(Resource):
         db.session.commit()
         return {"message": "Bus deleted"}, 200
 
-# ---- ROUTE ENDPOINTS ----
-class RouteResource(Resource):
-    def get(self):
-        return jsonify([route.serialize() for route in Route.query.all()])
+# # ---- ROUTE ENDPOINTS ----
+# class RouteResource(Resource):
+#     def get(self):
+#         return jsonify([route.serialize() for route in Route.query.all()])
 
-    def post(self):
-        data = request.get_json()
-        route = Route(**data)
-        db.session.add(route)
-        db.session.commit()
-        return {"message": "Route added"}, 201
+#     def post(self):
+#         data = request.get_json()
+#         route = Route(**data)
+#         db.session.add(route)
+#         db.session.commit()
+#         return {"message": "Route added"}, 201
 
 # ---- SCHEDULE ENDPOINTS ----
 class ScheduleResource(Resource):
@@ -204,7 +204,7 @@ class PaymentResource(Resource):
 api.add_resource(UserRegister, '/signup')
 api.add_resource(UserLogin, '/login')
 api.add_resource(BusResource, '/buses', '/buses/<int:bus_id>')
-api.add_resource(RouteResource, '/routes')
+# api.add_resource(RouteResource, '/routes')
 api.add_resource(ScheduleResource, '/schedules')
 api.add_resource(SeatResource, '/seats/<int:schedule_id>')
 api.add_resource(BookingResource, '/bookings')

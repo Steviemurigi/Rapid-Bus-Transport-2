@@ -1,5 +1,5 @@
 from app import db, app
-from models import User, Bus, Route, Schedule, Seat, Booking, Payment
+from models import User, Bus, Schedule, Seat, Booking, Payment
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import random
@@ -21,43 +21,65 @@ with app.app_context():
     db.session.add_all(users)
     db.session.commit()
 
+    # Fetch driver users
+    owner_kenneth = User.query.filter_by(email="driver1@example.com").first()
+    owner_jane = User.query.filter_by(email="driver2@example.com").first()
+
     # Create Buses
     buses = [
-        Bus(license_plate="KDN123", total_seats=40, bus_type="Standard", owner_id=2, status="Active", name="Bus 1", departure_area="New York", price=50),
-        Bus(license_plate="KDD789", total_seats=30, bus_type="Luxury", owner_id=3, status="Active", name="Bus 2", departure_area="San Francisco", price=75),
+        Bus(license_plate="KDN123", total_seats=40, bus_type="Standard", owner_id=2, status="Active", name="Bus 1", departure_area="Nakuru", price=50),
+        Bus(license_plate="KDD789", total_seats=30, bus_type="Luxury", owner_id=3, status="Active", name="Bus 2", departure_area="Kisii", price=75),
         Bus(license_plate="KDE456", total_seats=50, bus_type="Standard", owner_id=2, status="Active", name="Bus 3", departure_area="Nairobi", price=60),
         Bus(license_plate="KDF789", total_seats=60, bus_type="Luxury", owner_id=3, status="Active", name="Bus 4", departure_area="Mombasa", price=90),
         Bus(license_plate="KDG321", total_seats=45, bus_type="Standard", owner_id=2, status="Active", name="Bus 5", departure_area="Kisumu", price=55),
     ]
     db.session.add_all(buses)
     db.session.commit()
-
-    # Create Routes
-    routes = [
-        Route(start_location="Nairobi CBD", end_location="Mombasa", route_details="Nairobi - Mombasa", distance=230, name="Route 1", destination="Mombasa"),
-        Route(start_location="Mombasa", end_location="Nakuru", route_details="Mombasa - Nakuru", distance=380, name="Route 2", destination="Nakuru"),
-        Route(start_location="Nakuru", end_location="Kisumu", route_details="Nakuru - Kisumu", distance=380, name="Route 3", destination="Kisumu"),
-        Route(start_location="Kisumu", end_location="Nairobi CBD", route_details="Kisumu - Nairobi CBD", distance=380, name="Route 4", destination="Nairobi CBD"),
-        Route(start_location="Mombasa", end_location="Kisumu", route_details="Mombasa - Kisumu", distance=380, name="Route 5", destination="Kisumu"),
-    ]
-    db.session.add_all(routes)
-    db.session.commit()
+    
 
     # Create Schedules
-    schedules = []
-    for i in range(2):
-        schedules.append(
-            Schedule(
-                bus_id=buses[i].id,
-                route_id=routes[i].id,
-                departure_time=datetime.now() + timedelta(days=i),
-                arrival_time=datetime.now() + timedelta(days=i, hours=6),
-                date=datetime.now().date() + timedelta(days=i),
-                status="On Time"
-            )
-        )
+    # Create Schedules (Each schedule has its own route details)
+    schedules = [
+        Schedule(
+            bus_id=buses[0].id,
+            departure_time=datetime.now() + timedelta(days=1),
+            arrival_time=datetime.now() + timedelta(days=1, hours=6),
+            date=datetime.now().date() + timedelta(days=1),
+            status="On Time",
+            start_location="Nairobi",
+            end_location="Mombasa",
+            route_details="Nairobi - Mombasa via A104",
+            destination="Mombasa",
+            price=buses[0].price
+        ),
+        Schedule(
+            bus_id=buses[1].id,
+            departure_time=datetime.now() + timedelta(days=2),
+            arrival_time=datetime.now() + timedelta(days=2, hours=6),
+            date=datetime.now().date() + timedelta(days=2),
+            status="On Time",
+            start_location="Mombasa",
+            end_location="Kisumu",
+            route_details="Mombasa - Kisumu via A123",
+            destination="Kisumu",
+            price=buses[0].price
+        ),
+        Schedule(
+            bus_id=buses[2].id,
+            departure_time=datetime.now() + timedelta(days=3),
+            arrival_time=datetime.now() + timedelta(days=3, hours=6),
+            date=datetime.now().date() + timedelta(days=3),
+            status="On Time",
+            start_location="Kisumu",
+            end_location="Nairobi",
+            route_details="Kisumu - Nairobi via A456",
+            destination="Nairobi",
+            price=buses[0].price
+        ),
+    ]
     db.session.add_all(schedules)
     db.session.commit()
+
 
     # Create Seats
     seats = []
@@ -78,14 +100,17 @@ with app.app_context():
     db.session.commit()
 
     # Assign Seats to Bookings
-    booked_seats = [
-        Seat.query.filter_by(schedule_id=schedules[0].id, seat_number=1).first(),
-        Seat.query.filter_by(schedule_id=schedules[1].id, seat_number=2).first(),
-    ]
-    booked_seats[0].status = "Booked"
-    booked_seats[1].status = "Booked"
-    bookings[0].seats.append(booked_seats[0])
-    bookings[1].seats.append(booked_seats[1])
+    seat_1 = Seat.query.filter_by(schedule_id=schedules[0].id, seat_number=1).first()
+    seat_2 = Seat.query.filter_by(schedule_id=schedules[1].id, seat_number=2).first()
+
+    if seat_1 and seat_2:
+        seat_1.status = "Booked"
+        seat_2.status = "Booked"
+        bookings[0].seats.append(seat_1)
+        bookings[1].seats.append(seat_2)
+    else:
+        print("Error: Could not find seats to book.")
+
     db.session.commit()
 
     # Create Payments
