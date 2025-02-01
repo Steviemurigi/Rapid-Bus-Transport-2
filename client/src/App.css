@@ -220,3 +220,50 @@ td {
     grid-template-columns: 1fr;
   }
 }
+
+nav {
+  display: flex;
+  justify-content: space-between; /* Push items to edges */
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: flex;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-right {
+  margin-left: auto; /* Push to the right */
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.logout-button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.user-icon {
+  margin-right: 5px;
+}

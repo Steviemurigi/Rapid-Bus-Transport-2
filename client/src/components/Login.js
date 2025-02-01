@@ -23,11 +23,13 @@ function Login() {
       });
 
       const data = await response.json();
+      console.log("Login API Response:", data);
+      
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user_role", data.role);
-        localStorage.setItem("username", data.name); 
+        localStorage.setItem("user_role", data.user.role);
+        localStorage.setItem("username", data.user.name); 
         navigate("/");
       } else {
         setError(data.message || "Invalid credentials");
@@ -81,3 +83,4 @@ function Login() {
 }
 
 export default Login;
+console.log("Login API Response:", data);

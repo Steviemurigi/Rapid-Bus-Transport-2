@@ -58,7 +58,15 @@ class UserLogin(Resource):
         # Check if user exists and password is correct
         if user and user.check_password(data['password']):
             access_token = create_access_token(identity=user.id)
-            return {"access_token": access_token}, 200
+            return {
+                "access_token": access_token,
+                "user": {
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email,
+                    "role": user.role
+                }
+            }, 200
         
         return {"message": "Invalid credentials"}, 401
 
