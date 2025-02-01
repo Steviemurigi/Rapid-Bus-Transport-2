@@ -23,7 +23,7 @@ function Login() {
       });
 
       const data = await response.json();
-      console.log("Login API Response:", data);
+      
       
 
       if (response.ok) {
@@ -83,4 +83,3 @@ function Login() {
 }
 
 export default Login;
-console.log("Login API Response:", data);
