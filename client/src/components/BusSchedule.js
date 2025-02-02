@@ -40,20 +40,37 @@ const BusSchedule = () => {
 
     const navigate = useNavigate(); // Initialize useNavigate
 
-    const handleBookNow = async(bus) => {
-        const token = localStorage.getItem("token"); // Check if user is logged in 
-
-        if (token === "true") {
-            // User is logged in, proceed with booking
-            alert(`Booking ${bus.bus_name}`); // Or your actual booking logic
-            // ... your booking logic here (API call, etc.) ...
-        } else {
-            // User is not logged in, redirect to login/signup
-            alert("You must be logged in to book a bus."); // Inform the user
-            navigate("/login"); // Redirect to your login route
-            // Or navigate("/signup") if you want to redirect to signup instead
-        }
-    };
+    const handleBookNow = async (bus) => {
+      const token = localStorage.getItem("token");
+  
+      if (token) {
+          try {
+              const response = await axios.post(
+                  `${API_BASE_URL}/bookings`, // Or your booking endpoint
+                  {
+                      // Booking data (bus ID, seat information, etc.)
+                      bus_id: bus.id, // Example
+                      // ... other booking data
+                  },
+                  {
+                      headers: {
+                          Authorization: `Bearer ${token}`, // Include the token in the header
+                      },
+                  }
+              );
+              // Handle successful booking
+              console.log("Booking successful:", response.data);
+              alert("Booking Successful")
+          } catch (error) {
+              // Handle booking error
+              console.error("Booking error:", error);
+              alert("Booking Failed, please try again")
+          }
+      } else {
+          // ... redirect to login
+      }
+  };
+  
 
     return (
         <div className="bus-schedule-container">
