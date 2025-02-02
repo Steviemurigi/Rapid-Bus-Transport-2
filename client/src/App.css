@@ -226,8 +226,8 @@ nav {
   justify-content: space-between; /* Push items to edges */
   align-items: center;
   padding: 10px 20px;
-  background-color: #333;
-  color: white;
+  background-color: #D97706;
+  color: rgb(15, 14, 14);
 }
 
 nav ul {
@@ -256,8 +256,8 @@ nav ul li {
 }
 
 .logout-button {
-  background: red;
-  color: white;
+  background: #46211A;
+  color: rgb(245, 244, 244);
   border: none;
   padding: 5px 10px;
   cursor: pointer;

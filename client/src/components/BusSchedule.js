@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./BusSchedule.css";
 
 const BusSchedule = () => {
@@ -36,6 +37,23 @@ const BusSchedule = () => {
 
     // Dynamically generate route options
     const availableRoutes = [...new Set(busSchedules.map((bus) => bus.route))];
+
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    const handleBookNow = async(bus) => {
+        const token = localStorage.getItem("token"); // Check if user is logged in 
+
+        if (token === "true") {
+            // User is logged in, proceed with booking
+            alert(`Booking ${bus.bus_name}`); // Or your actual booking logic
+            // ... your booking logic here (API call, etc.) ...
+        } else {
+            // User is not logged in, redirect to login/signup
+            alert("You must be logged in to book a bus."); // Inform the user
+            navigate("/login"); // Redirect to your login route
+            // Or navigate("/signup") if you want to redirect to signup instead
+        }
+    };
 
     return (
         <div className="bus-schedule-container">
@@ -96,7 +114,7 @@ const BusSchedule = () => {
                                     <td>
                                         <button
                                             className="book-btn"
-                                            onClick={() => alert(`Booking ${bus.bus_name}`)}
+                                            onClick={() => handleBookNow(bus)}
                                         >
                                             Book Now
                                         </button>
