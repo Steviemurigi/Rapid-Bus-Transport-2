@@ -44,7 +44,6 @@ const BusSchedule = () => {
         const token = localStorage.getItem("token");
 
         if (token) { // Check if token exists (not just if it's "true")
-            // User is logged in, proceed with booking
             alert(`Booking ${bus.bus_name}`); // Or your actual booking logic
             // ... your booking logic here (API call, etc.) ...
         } else {
