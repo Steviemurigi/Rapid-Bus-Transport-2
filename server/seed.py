@@ -77,15 +77,15 @@ with app.app_context():
             price=buses[0].price
         ),
         Schedule(
-            bus_id=buses[2].id,
+            bus_id=buses[3].id,
             departure_time=datetime.now() + timedelta(days=3),
             arrival_time=datetime.now() + timedelta(days=3, hours=6),
             date=datetime.now().date() + timedelta(days=3),
             status="On Time",
-            start_location="Kisumu",
-            end_location="Nairobi",
-            route_details="Kisumu - Nairobi via A456",
-            destination="Nairobi",
+            start_location="Nairobi",
+            end_location="Kisii",
+            route_details="Nairobi - Kisii via A466",
+            destination="Kisii",
             price=buses[0].price
         ),
     ]
